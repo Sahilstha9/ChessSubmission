@@ -7,29 +7,28 @@ using SplashKitSDK;
 
 namespace ChessGame
 {
-    public class Bishop : Piece
+    public class Bishop : Piece, IPieceStrategy
     {
-        private MoveDiagonal _moveDiagonal;
+        private Lazy<MoveDiagonal> _moveDiagonal;
         private List<IHavePosition> leftup, rightdown, leftdown, rightup;
         private Return _return;
-        public Bishop(bool colour, int posX, int posY, List<Piece> board)
+        public Bishop(List<PieceManager> board, PieceManager controller)
         {
-            Colour = colour;
-            PosX = posX;
-            PosY = posY;
+            _controller = controller;
+            Colour = _controller.Colour;
             _board = board;
-            _moveDiagonal = new MoveDiagonal(board, this);
+            _moveDiagonal = new Lazy<MoveDiagonal>(() =>new MoveDiagonal(board, _controller));
             _return = new Return();
         }
 
         public override List<IHavePosition> AvailableMove()
         {
             List<IHavePosition> path = new List<IHavePosition>();
-            leftup = _moveDiagonal.MoveLeftUp();
-            leftdown = _moveDiagonal.MoveLeftDown();
-            rightup = _moveDiagonal.MoveRightUp();
-            rightdown = _moveDiagonal.MoveRightDown();
-            if (!_ispinned)
+            leftup = _moveDiagonal.Value.MoveLeftUp();
+            leftdown = _moveDiagonal.Value.MoveLeftDown();
+            rightup = _moveDiagonal.Value.MoveRightUp();
+            rightdown = _moveDiagonal.Value.MoveRightDown();
+            if (!_controller.Pinned)
             {
                 path.AddRange(_return.ReturnPath(rightup));
                 path.AddRange(_return.ReturnPath(rightdown));
@@ -38,28 +37,28 @@ namespace ChessGame
             }
             else
             {
-                if (leftup.Contains(_pinner))
+                if (leftup.Contains(_controller.Pinner))
                 {
-                    path.AddRange(leftup.GetRange(0, leftup.IndexOf(_pinner) + 1));
+                    path.AddRange(leftup.GetRange(0, leftup.IndexOf(_controller.Pinner) + 1));
                     path.AddRange(_return.ReturnPath(rightdown));
                 }
-                else if (rightdown.Contains(_pinner))
+                else if (rightdown.Contains(_controller.Pinner))
                 {
-                    path.AddRange(rightdown.GetRange(0, rightdown.IndexOf(_pinner) + 1));
+                    path.AddRange(rightdown.GetRange(0, rightdown.IndexOf(_controller.Pinner) + 1));
                     path.AddRange(_return.ReturnPath(leftup));
                 }
-                else if (rightup.Contains(_pinner))
+                else if (rightup.Contains(_controller.Pinner))
                 {
-                    path.AddRange(rightup.GetRange(0, rightup.IndexOf(_pinner) + 1));
+                    path.AddRange(rightup.GetRange(0, rightup.IndexOf(_controller.Pinner) + 1));
                     path.AddRange(_return.ReturnPath(leftdown));
                 }
-                else if (leftdown.Contains(_pinner))
+                else if (leftdown.Contains(_controller.Pinner))
                 {
-                    path.AddRange(leftdown.GetRange(0, leftdown.IndexOf(_pinner) + 1));
+                    path.AddRange(leftdown.GetRange(0, leftdown.IndexOf(_controller.Pinner) + 1));
                     path.AddRange(_return.ReturnPath(rightup));
                 }
             }
-            foreach (Piece p in _board)
+            foreach (PieceManager p in _board)
             {
                 if (p.Colour != Colour)
                 {
@@ -73,10 +72,10 @@ namespace ChessGame
         public override List<IHavePosition> CheckPath(IHavePosition king)
         {
             List<IHavePosition> path = new List<IHavePosition>();
-            leftup = _moveDiagonal.MoveLeftUp();
-            leftdown = _moveDiagonal.MoveLeftDown();
-            rightup = _moveDiagonal.MoveRightUp();
-            rightdown = _moveDiagonal.MoveRightDown();
+            leftup = _moveDiagonal.Value.MoveLeftUp();
+            leftdown = _moveDiagonal.Value.MoveLeftDown();
+            rightup = _moveDiagonal.Value.MoveRightUp();
+            rightdown = _moveDiagonal.Value.MoveRightDown();
             if (leftdown.Contains(king))
                 path.AddRange(leftdown.GetRange(0, leftdown.IndexOf(king)));
             else if (leftup.Contains(king))
@@ -85,20 +84,16 @@ namespace ChessGame
                 path.AddRange(rightdown.GetRange(0, rightdown.IndexOf(king)));
             else if (rightup.Contains(king))
                 path.AddRange(rightup.GetRange(0, rightup.IndexOf(king)));
+            path.Add(_controller);
             return path;
         }
 
         public override void Draw()
         {
-            if (Selected)
-            {
-                DrawOutline();
-                DrawAvailableMove();
-            }
             if (Colour)
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wBishopImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/w_bishop_png_shadow_128px.png"), PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wBishopImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/w_bishop_png_shadow_128px.png"), _controller.PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, _controller.PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
             else
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bBishopImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/b_bishop_png_shadow_128px.png"), PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bBishopImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/b_bishop_png_shadow_128px.png"), _controller.PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, _controller.PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
         }
     }
 }

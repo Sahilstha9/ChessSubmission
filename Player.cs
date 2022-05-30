@@ -11,28 +11,22 @@ namespace ChessGame
     {
         private bool _colour;
         private bool _myturn;
-        private Piece _king;
-        private List<Piece> _pieces;
-        private Clock _myClock;
+        private Lazy<PieceManager> _king;
+        private List<PieceManager> _pieces;
+        private Lazy<Clock> _myClock;
         Timer time;
 
-        public Player(bool colour, bool turn, List<Piece> board)
+        public Player(bool colour, bool turn, List<PieceManager> board)
         {
-            _myClock = new Clock();
-            _pieces = new List<Piece>();
+            _myClock = new Lazy<Clock>(() => new Clock());
+            _pieces = new List<PieceManager>();
             _colour = colour;
             _pieces = board;
-            foreach (Piece p in _pieces)
-            {
-                if (p is King)
-                    _king = p;
-                p.Player = this;
-            }
             InitTimer();
             _myturn = turn;
         }
 
-        public bool MovePiece(Piece p, int x , int y)
+        public bool MovePiece(PieceManager p, int x , int y)
         {
             if (_myturn)
                 return p.Move(x, y);
@@ -48,10 +42,10 @@ namespace ChessGame
             time.Start();
         }
 
-        public void UpdatePieces(List<Piece> board)
+        public void UpdatePieces(List<PieceManager> board)
         {
-            _pieces = new List<Piece>();
-            foreach (Piece p in board)
+            _pieces = new List<PieceManager>();
+            foreach (PieceManager p in board)
             {
                 if (p.Colour == _colour)
                 {
@@ -63,10 +57,10 @@ namespace ChessGame
 
         public void UpdateClock(object o, System.Timers.ElapsedEventArgs e)
         {
-            if (_myClock.Display() == "00:00")
+            if (_myClock.Value.Display() == "00:00")
                 return;
             if(_myturn)
-                _myClock.ClockDecrement();
+                _myClock.Value.ClockDecrement();
         }
 
 
@@ -75,7 +69,7 @@ namespace ChessGame
             get { return _colour; }
         }
 
-        public List<Piece> Pieces
+        public List<PieceManager> Pieces
         {
             get { return _pieces; }
         }
@@ -83,23 +77,28 @@ namespace ChessGame
         public bool Turn
         {
             get
-            {
-                return _myturn;
-            }
+            { return _myturn; }
             set
-            {
-                _myturn = value;
-            }
+            { _myturn = value; }
         }
 
         public string Clock
         {
-            get { return _myClock.Display(); }
+            get { return _myClock.Value.Display();}
         }
 
-        public King KingPiece
+        public PieceManager KingPiece
         {
-            get { return (King)_king; }
+            get 
+            {
+                foreach (PieceManager p in _pieces)
+                {
+                    if (p.Piece is King)
+                        _king = new Lazy<PieceManager>(() => p);
+                    p.Player = this;
+                }
+                return _king.Value;
+            }
         }
     }
 }

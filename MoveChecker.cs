@@ -8,15 +8,12 @@ namespace ChessGame
 {
     public class MoveCheckerPiece
     {
-        private int _posX, _posY;
-        private List<Piece> _board;
-        private bool _colour;
+        private List<PieceManager> _board;
+        private PieceManager _piece;
 
-        public MoveCheckerPiece(List<Piece> board, Piece p)
+        public MoveCheckerPiece(List<PieceManager> board, PieceManager p)
         {
-            _posX = p.PosX;
-            _posY = p.PosY;
-            _colour = p.Colour;
+            _piece = p;
             _board = board;
         }
 
@@ -24,16 +21,16 @@ namespace ChessGame
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (Piece p in _board)
+            foreach (PieceManager p in _board)
             {
-                if (p.PosX == posX && p.PosY == posY && p.Colour != _colour)
+                if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
             }
             if (hasPiece != _hasPiece && i % 2 == 0 && posX >= 0 && posY >= 0)
                 path.Add(new EmptySquare(posX, posY));
             if (i == 4 || _hasPiece == hasPiece || posX < 0 || posY < 0)
                 return path;
-            if (i >= 2)
+            if (i > 2)
                 path.AddRange(MoveRightUp(i + 1, posX + 1, posY - 1, _hasPiece));
             path.AddRange(MoveLeftUp(i + 1, posX - 1, posY - 1, _hasPiece));
             return path;
@@ -43,9 +40,9 @@ namespace ChessGame
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (Piece p in _board)
+            foreach (PieceManager p in _board)
             {
-                if (p.PosX == posX && p.PosY == posY && p.Colour != _colour)
+                if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
             }
             if (hasPiece != _hasPiece && i % 2 == 0 && posX < 8 && posY >= 0)
@@ -53,7 +50,7 @@ namespace ChessGame
             if (i == 4 || _hasPiece == hasPiece || posX > 7 || posY < 0)
                 return path;
             path.AddRange(MoveRightUp(i + 1, posX + 1, posY - 1, _hasPiece));
-            if (i >= 2)
+            if (i > 2)
                 path.AddRange(MoveLeftUp(i + 1, posX - 1, posY + 1, _hasPiece));
             return path;
         }
@@ -62,18 +59,18 @@ namespace ChessGame
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (Piece p in _board)
+            foreach (PieceManager p in _board)
             {
-                if (p.PosX == posX && p.PosY == posY && p.Colour != _colour)
+                if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
             }
             if (hasPiece != _hasPiece && i % 2 == 0 && posX >= 0 && posY < 8)
                 path.Add(new EmptySquare(posX, posY));
             if (i == 4 || _hasPiece == hasPiece || posX < 0 || posY > 7)
                 return path;
-            if (i >= 2)
-                path.AddRange(MoveLeftDown(i + 1, posX - 1, posY + 1, _hasPiece));
-            path.AddRange(MoveRightDown(i + 1, posX + 1, posY + 1, _hasPiece));
+            if (i > 2)
+                path.AddRange(MoveRightDown(i + 1, posX + 1, posY + 1, _hasPiece));
+            path.AddRange(MoveLeftDown(i + 1, posX - 1, posY + 1, _hasPiece));
             return path;
         }
 
@@ -81,16 +78,16 @@ namespace ChessGame
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (Piece p in _board)
+            foreach (PieceManager p in _board)
             {
-                if (p.PosX == posX && p.PosY == posY && p.Colour != _colour)
+                if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
             }
             if (hasPiece != _hasPiece && i % 2 == 0 && posX < 8 && posY < 8)
                 path.Add(new EmptySquare(posX, posY));
             if (i == 4 || _hasPiece == hasPiece || posX > 7 || posY > 7)
                 return path;
-            if (i >= 2)
+            if (i > 2)
                 path.AddRange(MoveLeftDown(i + 1, posX - 1, posY + 1, _hasPiece));
             path.AddRange(MoveRightDown(i + 1, posX + 1, posY + 1, _hasPiece));
             return path;
@@ -99,63 +96,63 @@ namespace ChessGame
         public void RemovePiece(int posX, int posY)
         {
             List<IHavePosition> toRemove = new List<IHavePosition>();
-            if (posY == _posY + 2)
+            if (posY == _piece.PosY + 2)
             {
-                if (posX == _posX + 2)
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY + 1));
-                else
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY + 1));
+                if (posX == _piece.PosX + 2)
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY + 1));
+                else if (posX == _piece.PosX - 2)
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY + 1));
             }
-            else if (posY == _posY - 2)
+            else if (posY == _piece.PosY - 2)
             {
-                if (posX == _posX + 2)
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY - 1));
-                else
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY - 1));
+                if (posX == _piece.PosX + 2)
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY - 1));
+                else if (posX == _piece.PosX - 2)
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY - 1));
             }
-            else if (posY == _posY + 4)
+            else if (posY == _piece.PosY + 4)
             {
-                if (posX == _posX + 4)
+                if (posX == _piece.PosX + 4)
                 {
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY + 1));
-                    toRemove.Add(new EmptySquare(_posX + 3, _posY + 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY + 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 3, _piece.PosY + 3));
                 }
-                else if (posX == _posX - 4)
+                else if (posX == _piece.PosX - 4)
                 {
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY + 1));
-                    toRemove.Add(new EmptySquare(_posX - 3, _posY + 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY + 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 3, _piece.PosY + 3));
                 }
-                else
+                else if(posX == _piece.PosX)
                 {
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY + 1));
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY + 3));
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY + 1));
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY + 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY + 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY + 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY + 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY + 3));
                 }
             }
-            else
+            else if(posY == _piece.PosY - 4)
             {
-                if (posX == _posX + 4)
+                if (posX == _piece.PosX + 4)
                 {
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY - 1));
-                    toRemove.Add(new EmptySquare(_posX + 3, _posY - 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY - 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 3, _piece.PosY - 3));
                 }
-                else if (posX == _posX - 4)
+                else if (posX == _piece.PosX - 4)
                 {
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY - 1));
-                    toRemove.Add(new EmptySquare(_posX - 3, _posY - 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY - 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 3, _piece.PosY - 3));
                 }
-                else
+                else if (posX == _piece.PosX)
                 {
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY - 1));
-                    toRemove.Add(new EmptySquare(_posX - 1, _posY - 3));
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY - 1));
-                    toRemove.Add(new EmptySquare(_posX + 1, _posY - 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY - 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX - 1, _piece.PosY - 3));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY - 1));
+                    toRemove.Add(new EmptySquare(_piece.PosX + 1, _piece.PosY - 3));
                 }
             }
             List<IHavePosition> tempList = new List<IHavePosition>();
             tempList.AddRange(_board);
-            foreach (Piece p in tempList)
+            foreach (PieceManager p in tempList)
             {
                 foreach (IHavePosition sq in toRemove)
                 {

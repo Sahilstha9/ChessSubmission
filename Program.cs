@@ -8,7 +8,7 @@ namespace ChessGame // Note: actual namespace depends on the project name.
         static void Main(string[] args)
         {
             new Window("Shape Drawer", 750, 750);
-            Screen gamechoice = Screen.Home;
+            State gamechoice = State.Home;
             do
             {
                 SplashKit.ProcessEvents();
@@ -16,16 +16,16 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                 Board.Instance.Draw();
                 switch(gamechoice)
                 {
-                    case Screen.Home:
+                    case State.Home:
                         Game choice = DrawHomeScreen();
                         if (choice != Game.NotSet)
                         {
-                            gamechoice = Screen.Game;
+                            gamechoice = State.Game;
                             Board.Instance.SetType = choice;
                         }
                         break;
-                    case Screen.Game:
-                        foreach (Piece p in Board.Instance.GameBoard)
+                    case State.Game:
+                        foreach (PieceManager p in Board.Instance.GameBoard)
                             p.Draw();
                         Board.Instance.Update();
 
@@ -34,7 +34,7 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                             if (!Board.Instance.GameOver)
                             {
                                 IHavePosition s = null;
-                                foreach(Piece p in Board.Instance.GameBoard)
+                                foreach(PieceManager p in Board.Instance.GameBoard)
                                 {
                                     if (p.IsAt(SplashKit.MousePosition()))
                                         s = p;
@@ -45,8 +45,10 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                                     Board.Instance.LeftClick(EmptySquareIsAt(SplashKit.MousePosition()));
                             }
                             else
-                                gamechoice = Screen.Home;
+                                gamechoice = State.Home;
                         }
+                        if(SplashKit.KeyTyped(KeyCode.CKey))
+                            Board.Instance.ChangePromotionPiece();
                         break;
                 }
                 SplashKit.RefreshScreen();

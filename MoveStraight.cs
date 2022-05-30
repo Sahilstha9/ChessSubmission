@@ -8,11 +8,11 @@ namespace ChessGame
 {
     public class MoveStraight
     {
-        private List<Piece> _board;
+        private List<PieceManager> _board;
         private int _index;
         private bool _haspiece;
-        private Piece _piece;
-        public MoveStraight(List<Piece> board, Piece p)
+        private PieceManager _piece;
+        public MoveStraight(List<PieceManager> board, PieceManager p)
         {
             _board = board;
             _piece = p;
@@ -28,7 +28,7 @@ namespace ChessGame
             while (y >= 0)
             {
                 IHavePosition x = new EmptySquare(_piece.PosX, y);
-                foreach (Piece p in _board)
+                foreach (PieceManager p in _board)
                 {
                     if (p.IsEqual(x))
                     {
@@ -53,7 +53,7 @@ namespace ChessGame
             while (y <= 7)
             {
                 IHavePosition x = new EmptySquare(_piece.PosX, y);
-                foreach (Piece p in _board)
+                foreach (PieceManager p in _board)
                 {
                     if (p.IsEqual(x))
                     {
@@ -78,7 +78,7 @@ namespace ChessGame
             while (x >= 0)
             {
                 IHavePosition w = new EmptySquare(x, _piece.PosY);
-                foreach (Piece p in _board)
+                foreach (PieceManager p in _board)
                 {
                     if (p.IsEqual(w))
                     {
@@ -103,7 +103,7 @@ namespace ChessGame
             while (x <= 7)
             {
                 IHavePosition w = new EmptySquare(x, _piece.PosY);
-                foreach (Piece p in _board)
+                foreach (PieceManager p in _board)
                 {
                     if (p.IsEqual(w))
                     {
@@ -118,7 +118,7 @@ namespace ChessGame
             return path;
         }
 
-        public void Pin(List<IHavePosition> path, Piece x, int i)
+        public void Pin(List<IHavePosition> path, PieceManager x, int i)
         {
             if (!_haspiece)
             {
@@ -127,12 +127,12 @@ namespace ChessGame
             }
             else
             {
-                if (x is King && x.Colour != _piece.Colour)
+                if (x.Piece is King && x.Colour != _piece.Colour)
                 {
-                    if ((path[_index] as Piece).Colour != _piece.Colour && path[_index] is not King)
+                    if ((path[_index] as PieceManager).Colour != _piece.Colour && (path[_index] as PieceManager).Piece is not King)
                     {
-                        (path[_index] as Piece).Pinned = true;
-                        (path[_index] as Piece).Pinner = _piece;
+                        (path[_index] as PieceManager).Pinned = true;
+                        (path[_index] as PieceManager).Pinner = _piece;
                     }
                 }
             }

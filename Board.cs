@@ -9,13 +9,13 @@ namespace ChessGame
 {
     public class Board
     {
-        static int whitecount = 0, blackcount = 0;
-        private List<Piece> _board;
-        private Piece _checkingPiece;
+        private List<PieceManager> _board;
+        private PieceManager _checkingPiece;
         private Player wP, bP;
         private bool _gameOver;
         private Game _gameType;
         private static Board _instance;
+        private PieceType _promotionPiece;
 
         //BoardClass takes an string gametype and depending on the string initialises
         //either chess or checkers game
@@ -23,7 +23,8 @@ namespace ChessGame
         {
             _gameOver = false;
             _checkingPiece = null;
-            _board = new List<Piece>();
+            _board = new List<PieceManager>();
+            _promotionPiece = PieceType.Queen;
         }
 
         public static Board Instance
@@ -40,22 +41,11 @@ namespace ChessGame
         {
             set
             {
-                _board = new List<Piece>();
-                for (int i = 0; i < 8; i++)
-                {
-                    for (int j = 0; j < 8; j++)
-                    {
-                        if (value == Game.Chess)
-                            InitialiseChessPieces(i, j);
-                        else if (value == Game.Checker)
-                            InitialiseCheckerPieces(i, j);
-                        else if (value == Game.Mix)
-                            InitialiseMixPieces(i, j);
-                    }
-                }
-                List<Piece> whitepiece = new List<Piece>();
-                List<Piece> blackpiece = new List<Piece>();
-                foreach (Piece p in _board)
+                _board = new List<PieceManager>();
+                new PieceManagerFactory(value, _board);
+                List<PieceManager> whitepiece = new List<PieceManager>();
+                List<PieceManager> blackpiece = new List<PieceManager>();
+                foreach (PieceManager p in _board)
                 {
                     if (p.Colour == false)
                         blackpiece.Add(p);
@@ -81,9 +71,9 @@ namespace ChessGame
                     GameCheckerOver();
                     break;
                 case Game.Chess:
-                    foreach (Piece p in _board)
+                    foreach (PieceManager p in _board)
                         p.Pinned = false;
-                    foreach (Piece p in _board)
+                    foreach (PieceManager p in _board)
                     {
                         p.Checker = false;
                         p.AvailableMove();
@@ -107,6 +97,15 @@ namespace ChessGame
             bP.UpdatePieces(_board);
         }
 
+        public void ChangePromotionPiece()
+        {
+            int i = (int)_promotionPiece;
+            i++;
+            if (i > 7)
+                i = 1;
+            _promotionPiece = (PieceType)i;
+        }
+
         public void GameCheckerOver()
         {
             if (wP.Pieces.Count == 0)
@@ -119,13 +118,13 @@ namespace ChessGame
 
         //MonitorCheck checks for any checks on the board and returns the piece
         //checking the king
-        public Piece MonitorCheck(Player white, Player black)
+        public PieceManager MonitorCheck(Player white, Player black)
         {
             if (white.Turn)
             {
-                foreach (Piece p in black.Pieces)
+                foreach (PieceManager p in black.Pieces)
                 {
-                    if (p.AvailableMove().Contains(white.KingPiece) && p is not King)
+                    if (p.AvailableMove().Contains(white.KingPiece) && p.Piece is not King)
                     {
                         p.Checker = true;
                         return p;
@@ -134,9 +133,9 @@ namespace ChessGame
             }
             else
             {
-                foreach (Piece p in white.Pieces)
+                foreach (PieceManager p in white.Pieces)
                 {
-                    if (p.AvailableMove().Contains(black.KingPiece) && !(p is King))
+                    if (p.AvailableMove().Contains(black.KingPiece) && p.Piece is not King)
                     {
                         p.Checker = true;
                         return p;
@@ -148,7 +147,7 @@ namespace ChessGame
 
         public void LeftClick(IHavePosition p)
         {
-            foreach (Piece piece in _board)
+            foreach (PieceManager piece in _board)
             {
                 if (piece.Selected)
                 {
@@ -167,149 +166,20 @@ namespace ChessGame
                     }
                     else
                     {
-                        if(p is Piece)
-                            (p as Piece).Selected = true;
+                        if(p is PieceManager)
+                            (p as PieceManager).Selected = true;
                         piece.Selected = false;
                     }
                     return;
                 }
             }    
-            if(p is Piece)
-                (p as Piece).Selected = true;
+            if(p is PieceManager)
+                (p as PieceManager).Selected = true;
         }
 
-        public List<Piece> GameBoard
+        public List<PieceManager> GameBoard
         {
             get { return _board; }
-        }
-
-        public void MovePieces(Piece p, int posX, int posY, bool colour)
-        {
-            p.Move(posX, posY);
-        }
-
-        //Initialises board with chess pieces
-        private void InitialiseChessPieces(int i, int j)
-        {
-            if (j == 1)
-                _board.Add(new Pawn(false, i, j, _board));
-            else if (j == 6)
-                _board.Add(new Pawn(true, i, j, _board));
-            else if ((j == 0) && (i == 0 || i == 7))
-                _board.Add(new Rook(false, i, j, _board));
-            else if ((j == 7) && (i == 0 || i == 7))
-                _board.Add(new Rook(true, i, j, _board));
-            else if ((j == 0) && (i == 1 || i == 6))
-                _board.Add(new Knight(false, i, j, _board));
-            else if ((j == 7) && (i == 1 || i == 6))
-                _board.Add(new Knight(true, i, j, _board));
-            else if ((j == 0) && (i == 2 || i == 5))
-                _board.Add(new Bishop(false, i, j, _board));
-            else if ((j == 7) && (i == 2 || i == 5))
-                _board.Add(new Bishop(true, i, j, _board));
-            else if (j == 0 && i == 3)
-                _board.Add(new Queen(false, i, j, _board));
-            else if (j == 7 && i == 3)
-                _board.Add(new Queen(true, i, j, _board));
-            else if (j == 0 && i == 4)
-                _board.Add(new King(false, i, j, _board));
-            else if (j == 7 && i == 4)
-                _board.Add(new King(true, i, j, _board));
-        }
-
-        //Initialises board with checker pieces
-        private void InitialiseCheckerPieces(int i, int j)
-        {
-            if (j < 3)
-            {
-                if (j % 2 == 0)
-                {
-                    if (i % 2 == 1)
-                        _board.Add(new CheckerPiece(false, i, j, _board));
-                }
-                else
-                {
-                    if (i % 2 == 0)
-                        _board.Add(new CheckerPiece(false, i, j, _board));
-                }
-            }
-            else if (j > 4)
-            {
-                if (j % 2 == 0)
-                {
-                    if (i % 2 == 1)
-                        _board.Add(new CheckerPiece(true, i, j, _board));
-                }
-                else
-                {
-                    if (i % 2 == 0)
-                        _board.Add(new CheckerPiece(true, i, j, _board));
-                }
-            }
-        }
-
-        private void InitialiseMixPieces(int i, int j)
-        {
-            if (j < 2)
-            {
-                int index = 0;
-                Random rnd = new Random();
-                index = rnd.Next(8);
-                switch (index)
-                {
-                    case 0:
-                        _board.Add(new Pawn(false, i, j, _board));
-                        break;
-                    case 1:
-                        _board.Add(new Rook(false, i, j, _board));
-                        break;
-                    case 2:
-                        _board.Add(new Knight(false, i, j, _board));
-                        break;
-                    case 3:
-                        _board.Add(new Bishop(false, i, j, _board));
-                        break;
-                    case 4:
-                        _board.Add(new Queen(false, i, j, _board));
-                        break;
-                    case 5:
-                        _board.Add(new CheckerPiece(false, i, j, _board));
-                        break;
-                    case 6:
-                        _board.Add(new CheckerKingPiece(false, i, j, _board));
-                        break;
-                }
-            }
-            else if (j > 5)
-            {
-                int index = 0;
-                Random rnd = new Random();
-                index = rnd.Next(8);
-                switch (index)
-                {
-                    case 0:
-                        _board.Add(new Pawn(true, i, j, _board));
-                        break;
-                    case 1:
-                        _board.Add(new Rook(true, i, j, _board));
-                        break;
-                    case 2:
-                        _board.Add(new Knight(true, i, j, _board));
-                        break;
-                    case 3:
-                        _board.Add(new Bishop(true, i, j, _board));
-                        break;
-                    case 4:
-                        _board.Add(new Queen(true, i, j, _board));
-                        break;
-                    case 5:
-                        _board.Add(new CheckerPiece(true, i, j, _board));
-                        break;
-                    case 6:
-                        _board.Add(new CheckerKingPiece(true, i, j, _board));
-                        break;
-                }
-            }
         }
 
         //Draws board on the screen
@@ -336,6 +206,7 @@ namespace ChessGame
 
                 }
             }
+            SplashKit.DrawText(_promotionPiece.ToString(), Color.Red, 10, 10);
         }
 
         private void DrawClock()
@@ -376,6 +247,11 @@ namespace ChessGame
         {
             get { return _gameOver; }
             set { _gameOver = value; }
+        }
+
+        public PieceType PromotionPiece
+        {
+            get { return _promotionPiece; }
         }
     }
 }
