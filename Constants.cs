@@ -13,7 +13,8 @@ namespace ChessGame
 
         public static Constants Instance
         {
-            get {
+            get
+            {
                 if (_instance == null)
                 {
                     _instance = new Constants();

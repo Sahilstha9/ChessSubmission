@@ -13,7 +13,6 @@ namespace ChessGame // Note: actual namespace depends on the project name.
             {
                 SplashKit.ProcessEvents();
                 SplashKit.ClearScreen(Color.RGBColor(50, 50, 0));
-                Board.Instance.Draw();
                 switch(gamechoice)
                 {
                     case State.Home:
@@ -25,6 +24,7 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                         }
                         break;
                     case State.Game:
+                        Board.Instance.Draw();
                         foreach (PieceManager p in Board.Instance.GameBoard)
                             p.Draw();
                         Board.Instance.Update();
@@ -49,6 +49,34 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                         }
                         if(SplashKit.KeyTyped(KeyCode.CKey))
                             Board.Instance.ChangePromotionPiece();
+                        if (SplashKit.KeyTyped(KeyCode.TKey))
+                        {
+                            Board.Instance.PrintBoard();
+                            gamechoice = State.Console;
+                        }
+                        break;
+                    case State.Console:
+                        while (true)
+                        {
+                            Board.Instance.Update();
+                            if (Board.Instance.GameOver)
+                            {
+                                Console.WriteLine("CheckMate");
+                                Console.ReadLine();
+                                if (SplashKit.AnyKeyPressed())
+                                    gamechoice = State.Home;
+                            }
+                            Console.WriteLine("\nEnter commnad: (Format :<PieceName><X to Move><Y to Move>)");
+                            string sentence = Console.ReadLine();
+                            if (sentence.ToLower() == "quit" || sentence.ToLower() == "exit")
+                                break;
+                            else if (sentence.ToLower() == "change")
+                            {
+                                gamechoice = State.Game;
+                                break;
+                            }
+                            Board.Instance.Input(sentence);
+                        }
                         break;
                 }
                 SplashKit.RefreshScreen();

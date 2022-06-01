@@ -16,6 +16,8 @@ namespace ChessGame
         private Game _gameType;
         private static Board _instance;
         private PieceType _promotionPiece;
+        private BoardDrawManager _drawManager;
+        private TextGame _text;
 
         //BoardClass takes an string gametype and depending on the string initialises
         //either chess or checkers game
@@ -25,6 +27,8 @@ namespace ChessGame
             _checkingPiece = null;
             _board = new List<PieceManager>();
             _promotionPiece = PieceType.Queen;
+            _drawManager = new BoardDrawManager();
+            _text = new TextGame(this);
         }
 
         public static Board Instance
@@ -61,7 +65,6 @@ namespace ChessGame
         public void Update()
         {
             _gameOver = TimeMonitor();
-            DrawClock();
             switch(_gameType)
             {
                 case Game.Checker:
@@ -91,11 +94,11 @@ namespace ChessGame
                     }
                     break;
             }
-            if (_gameOver)
-                DrawGameOver();
             wP.UpdatePieces(_board);
             bP.UpdatePieces(_board);
         }
+
+        public void Input(string s) => _text.Move(s, wP, bP);
 
         public void ChangePromotionPiece()
         {
@@ -106,6 +109,7 @@ namespace ChessGame
             _promotionPiece = (PieceType)i;
         }
 
+        public void PrintBoard() => _text.PrintBoard();
         public void GameCheckerOver()
         {
             if (wP.Pieces.Count == 0)
@@ -183,39 +187,7 @@ namespace ChessGame
         }
 
         //Draws board on the screen
-        public void Draw()
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    if (i % 2 == 0)
-                    {
-                        if (j % 2 == 0)
-                            SplashKit.FillRectangle(Color.White, i * Constants.Instance.Width + 50, j * Constants.Instance.Width + 50, Constants.Instance.Width, Constants.Instance.Width);
-                        else
-                            SplashKit.FillRectangle(Color.Black, i * Constants.Instance.Width + 50, j * Constants.Instance.Width + 50, Constants.Instance.Width, Constants.Instance.Width);
-                    }
-                    else
-                    {
-                        if (j % 2 == 0)
-                            SplashKit.FillRectangle(Color.Black, i * Constants.Instance.Width + 50, j * Constants.Instance.Width + 50, Constants.Instance.Width, Constants.Instance.Width);
-                        else
-                            SplashKit.FillRectangle(Color.White, i * Constants.Instance.Width + 50, j * Constants.Instance.Width + 50, Constants.Instance.Width, Constants.Instance.Width);
-                    }
-
-                }
-            }
-            SplashKit.DrawText(_promotionPiece.ToString(), Color.Red, 10, 10);
-        }
-
-        private void DrawClock()
-        {
-            SplashKit.FillRectangle(Color.Black, 330, 20, Constants.Instance.OffsetValue, 15);
-            SplashKit.DrawText(bP.Clock, Color.White, SplashKit.FontNamed("Arial"), 100, 340, 24);
-            SplashKit.FillRectangle(Color.White, 330, 705, Constants.Instance.OffsetValue, 15);
-            SplashKit.DrawText(wP.Clock, Color.Black, SplashKit.FontNamed("Arial"), 100, 340, 709);
-        }
+        public void Draw() => _drawManager.Draw(_gameOver, _promotionPiece, wP, bP);
 
         private bool TimeMonitor()
         {
@@ -226,23 +198,6 @@ namespace ChessGame
             return false;
         }
 
-        private void DrawGameOver()
-        {
-            if (wP.Turn)
-            {
-                SplashKit.FillRectangle(Color.Red, 195, 315, 310, 110);
-                SplashKit.FillRectangle(Color.Black, 200, 320, 300, 100);
-                SplashKit.DrawText("Click Anywhere to go back.....", Color.White, SplashKit.FontNamed("Calibri"), 200, 225, 400);
-                SplashKit.DrawText("You Won!\n by CheckMate", Color.White, SplashKit.FontNamed("Arial"), 100, 225, 350);
-            }
-            else
-            {
-                SplashKit.FillRectangle(Color.Red, 195, 315, 310, 110);
-                SplashKit.FillRectangle(Color.White, 200, 320, 300, 100);
-                SplashKit.DrawText("You Won!\n by CheckMate", Color.Black, SplashKit.FontNamed("Calibri"), 100, 225, 350);
-                SplashKit.DrawText("Click Anywhere to go back.....", Color.Black, SplashKit.FontNamed("Arial"), 200, 225, 400);
-            }
-        }
         public bool GameOver
         {
             get { return _gameOver; }

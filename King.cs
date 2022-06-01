@@ -96,8 +96,8 @@ namespace ChessGame
                             }
                         }
                     }
-                    _controller.PosX = 2;
-                    rook.PosX = 3;
+                    _controller.PosX = 6;
+                    rook.PosX = 5;
                     return true;
                 }
                 else

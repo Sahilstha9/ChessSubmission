@@ -18,11 +18,12 @@ namespace ChessGame
 
         public override bool Move(int posX, int posY)
         {
-            foreach(IHavePosition sq in AvailableMove())
+            Console.Write(posY);
+            foreach (IHavePosition sq in AvailableMove())
             {
-                if(sq.PosX == posX && sq.PosY == posY)
+                if (sq.PosX == posX && sq.PosY == posY)
                 {
-                    if(sq is EmptySquare || (sq is Piece && (sq as Piece).Colour != Colour))
+                    if (sq is EmptySquare || (sq is Piece && (sq as Piece).Colour != Colour))
                     {
                         RemovePieceFromBoard(posX, posY);
                         _controller.PosX = posX;

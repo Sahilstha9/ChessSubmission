@@ -9,7 +9,6 @@ namespace ChessGame
 {
     public abstract class Piece : IPieceStrategy
     {
-        private int _posX, _posY;
         private bool _colour;
         protected List<PieceManager> _board;
         protected PieceManager _controller;

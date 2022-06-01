@@ -19,7 +19,11 @@ namespace ChessGame
         public Player(bool colour, bool turn, List<PieceManager> board)
         {
             _myClock = new Lazy<Clock>(() => new Clock());
-            _pieces = new List<PieceManager>();
+            _pieces = board;
+            foreach(PieceManager p in _pieces)
+            {
+                p.Player = this;
+            }
             _colour = colour;
             _pieces = board;
             InitTimer();

@@ -10,12 +10,16 @@ namespace ChessGame
     public class Pawn : Piece, IPieceStrategy
     {
         private bool _firstmove;
+        private MoveStraight _moveStraight;
+        private MoveDiagonal _moveDiagonal;
         public Pawn(List<PieceManager> board, PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
             _firstmove = true;
             _board = board;
+            _moveStraight = new MoveStraight(_board, _controller);
+            _moveDiagonal = new MoveDiagonal(_board, _controller);
         }
 
         public override bool Move(int posX, int posY)
@@ -49,36 +53,31 @@ namespace ChessGame
         public override List<IHavePosition> AvailableMove()
         {
             List<IHavePosition> path = new List<IHavePosition>();
-            IHavePosition onestep, twostep, leftstep, rightstep;
-            if(Colour)
+            List<IHavePosition> pathToUse = new List<IHavePosition>();
+            List<IHavePosition> capturePath = new List<IHavePosition>();
+            if (Colour)
             {
-                onestep = new EmptySquare(_controller.PosX, _controller.PosY - 1);
-                twostep = new EmptySquare(_controller.PosX, _controller.PosY - 2);
-                leftstep = new EmptySquare(_controller.PosX - 1, _controller.PosY - 1);
-                rightstep = new EmptySquare(_controller.PosX + 1, _controller.PosY - 1);
+                pathToUse = _moveStraight.MoveUp();
+                if(_moveDiagonal.MoveLeftUp().Count > 0)
+                    capturePath.Add(_moveDiagonal.MoveLeftUp()[0]);
+                if (_moveDiagonal.MoveRightUp().Count > 0)
+                    capturePath.Add(_moveDiagonal.MoveRightUp()[0]);
             }
             else
             {
-                onestep = new EmptySquare(_controller.PosX, _controller.PosY + 1);
-                twostep = new EmptySquare(_controller.PosX, _controller.PosY + 2);
-                leftstep = new EmptySquare(_controller.PosX - 1, _controller.PosY + 1);
-                rightstep = new EmptySquare(_controller.PosX + 1, _controller.PosY + 1);
+                pathToUse = _moveStraight.MoveDown();
+                if (_moveDiagonal.MoveLeftDown().Count > 0)
+                    capturePath.Add(_moveDiagonal.MoveLeftDown()[0]);
+                if (_moveDiagonal.MoveRightDown().Count > 0)
+                    capturePath.Add(_moveDiagonal.MoveRightDown()[0]);
             }
-            path.Add(onestep);
-            if (_firstmove)
-                path.Add(twostep);
-            foreach (PieceManager p in _board)
+            if (pathToUse[0] is not PieceManager)
+                path.Add(pathToUse[0]);
+            if (_firstmove && pathToUse[1] is not PieceManager)
+                path.Add(pathToUse[1]);
+            foreach(IHavePosition p in capturePath)
             {
-                if (p.IsEqual(onestep))
-                {
-                    path.Remove(onestep);
-                    path.Remove(twostep);
-                }
-                else if (p.IsEqual(twostep))
-                    path.Remove(twostep);
-                else if (p.IsEqual(leftstep))
-                    path.Add(p);
-                else if (p.IsEqual(rightstep))
+                if (p is PieceManager && (p as PieceManager).Colour != Colour)
                     path.Add(p);
             }
             if(_controller.Pinned)
@@ -90,6 +89,8 @@ namespace ChessGame
                 }
                 else
                     path = new List<IHavePosition>();
+                if (pathToUse.Contains(_controller.Pinner))
+                    path.Add(pathToUse[0]);
                 return path;
             }
             foreach(PieceManager p in _board)
