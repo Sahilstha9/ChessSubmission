@@ -17,10 +17,21 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                 {
                     case State.Home:
                         Game choice = DrawHomeScreen();
+                        if (SplashKit.KeyTyped(KeyCode.TKey))
+                            gamechoice = State.ConsoleHome;
                         if (choice != Game.NotSet)
                         {
                             gamechoice = State.Game;
                             Board.Instance.SetType = choice;
+                        }
+                        break;
+                    case State.ConsoleHome:
+                        Game choices = Board.Instance.TextGame.Home();
+                        if(choices != Game.NotSet)
+                        {
+                            gamechoice = State.Console;
+                            Board.Instance.SetType = choices;
+                            Board.Instance.TextGame.PrintBoard();
                         }
                         break;
                     case State.Game:

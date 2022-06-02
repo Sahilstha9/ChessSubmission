@@ -10,18 +10,17 @@ namespace ChessGame
     public class CheckerKingPiece : Piece, IPieceStrategy
     {
         private MoveCheckerPiece _move;
-        public CheckerKingPiece(List<PieceManager> board, PieceManager controller)
+        public CheckerKingPiece(PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
-            _board = board;
-            _move = new MoveCheckerPiece(_board, _controller);
+            _move = new MoveCheckerPiece(_controller);
         }
 
         public override bool Move(int posX, int posY)
         {
             IHavePosition toMove = new EmptySquare(posX, posY);
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.IsEqual(toMove))
                     return false;
@@ -62,7 +61,7 @@ namespace ChessGame
             tempList.AddRange(path);
             foreach (IHavePosition sq in tempList)
             {
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(sq))
                         path.Remove(sq);

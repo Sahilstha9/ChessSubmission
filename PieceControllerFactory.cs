@@ -8,10 +8,8 @@ namespace ChessGame
 {
     public class PieceManagerFactory
     {
-        private List<PieceManager> _board;
-        public PieceManagerFactory(Game game, List<PieceManager> board)
+        public PieceManagerFactory(Game game)
         {
-            _board = board;
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -35,29 +33,29 @@ namespace ChessGame
         private void InitialiseChessPieces(int i, int j)
         {
             if (j == 1)
-                _board.Add(new PieceManager(i, j, false, _board, PieceType.Pawn));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Pawn));
             else if (j == 6)
-                _board.Add(new PieceManager(i, j, true, _board, PieceType.Pawn));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Pawn));
             else if ((j == 0) && (i == 0 || i == 7))
-                _board.Add(new PieceManager(i, j, false, _board, PieceType.Rook));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Rook));
             else if ((j == 7) && (i == 0 || i == 7))
-                _board.Add(new PieceManager(i, j, true, _board, PieceType.Rook));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Rook));
             else if ((j == 0) && (i == 1 || i == 6))
-                _board.Add(new PieceManager(i, j, false, _board, PieceType.Knight));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Knight));
             else if ((j == 7) && (i == 1 || i == 6))
-                _board.Add(new PieceManager(i, j, true, _board, PieceType.Knight));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Knight));
             else if ((j == 0) && (i == 2 || i == 5))
-                _board.Add(new PieceManager(i, j, false, _board, PieceType.Bishop));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Bishop));
             else if ((j == 7) && (i == 2 || i == 5))
-                _board.Add(new PieceManager(i, j, true, _board, PieceType.Bishop));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Bishop));
             else if (j == 0 && i == 3)
-                _board.Add(new PieceManager(i, j, false, _board, PieceType.Queen));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Queen));
             else if (j == 7 && i == 3)
-                _board.Add(new PieceManager(i, j, true, _board, PieceType.Queen));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Queen));
             else if (j == 0 && i == 4)
-                _board.Add(new PieceManager(i, j, false, _board, PieceType.King));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.King));
             else if (j == 7 && i == 4)
-                _board.Add(new PieceManager(i, j, true, _board, PieceType.King));
+                Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.King));
         }
 
         //Initialises board with checker pieces
@@ -68,12 +66,12 @@ namespace ChessGame
                 if (j % 2 == 0)
                 {
                     if (i % 2 == 1)
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Checker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Checker));
                 }
                 else
                 {
                     if (i % 2 == 0)
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Checker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Checker));
                 }
             }
             else if (j > 4)
@@ -81,12 +79,12 @@ namespace ChessGame
                 if (j % 2 == 0)
                 {
                     if (i % 2 == 1)
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Checker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Checker));
                 }
                 else
                 {
                     if (i % 2 == 0)
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Checker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Checker));
                 }
             }
         }
@@ -101,25 +99,25 @@ namespace ChessGame
                 switch (index)
                 {
                     case 0:
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Pawn));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Pawn));
                         break;
                     case 1:
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Rook));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Rook));
                         break;
                     case 2:
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Knight));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Knight));
                         break;
                     case 3:
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Bishop));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Bishop));
                         break;
                     case 4:
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Queen));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Queen));
                         break;
                     case 5:
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.Checker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.Checker));
                         break;
                     case 6:
-                        _board.Add(new PieceManager(i, j, false, _board, PieceType.KingChecker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, false,  PieceType.KingChecker));
                         break;
                 }
             }
@@ -131,25 +129,25 @@ namespace ChessGame
                 switch (index)
                 {
                     case 0:
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Pawn));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Pawn));
                         break;
                     case 1:
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Rook));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Rook));
                         break;
                     case 2:
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Knight));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Knight));
                         break;
                     case 3:
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Bishop));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Bishop));
                         break;
                     case 4:
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Queen));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Queen));
                         break;
                     case 5:
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.Checker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.Checker));
                         break;
                     case 6:
-                        _board.Add(new PieceManager(i, j, true, _board, PieceType.KingChecker));
+                        Board.Instance.GameBoard.Add(new PieceManager(i, j, true,  PieceType.KingChecker));
                         break;
                 }
             }

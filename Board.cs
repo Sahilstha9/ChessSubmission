@@ -28,7 +28,7 @@ namespace ChessGame
             _board = new List<PieceManager>();
             _promotionPiece = PieceType.Queen;
             _drawManager = new BoardDrawManager();
-            _text = new TextGame(this);
+            _text = new TextGame();
         }
 
         public static Board Instance
@@ -46,7 +46,7 @@ namespace ChessGame
             set
             {
                 _board = new List<PieceManager>();
-                new PieceManagerFactory(value, _board);
+                new PieceManagerFactory(value);
                 List<PieceManager> whitepiece = new List<PieceManager>();
                 List<PieceManager> blackpiece = new List<PieceManager>();
                 foreach (PieceManager p in _board)
@@ -202,6 +202,11 @@ namespace ChessGame
         {
             get { return _gameOver; }
             set { _gameOver = value; }
+        }
+
+        public TextGame TextGame
+        {
+            get { return _text; }
         }
 
         public PieceType PromotionPiece

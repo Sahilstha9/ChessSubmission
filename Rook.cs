@@ -12,12 +12,11 @@ namespace ChessGame
         private Lazy<MoveStraight> _moveStraight;
         List<IHavePosition> up, down, left, right;
         private Return _return;
-        public Rook(List<PieceManager> board, PieceManager controller)
+        public Rook(PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
-            _board = board;
-            _moveStraight= new Lazy<MoveStraight>(() => new MoveStraight(_board, _controller));
+            _moveStraight= new Lazy<MoveStraight>(() => new MoveStraight(_controller));
             _return = new Return();
         }
 
@@ -58,7 +57,7 @@ namespace ChessGame
                     path.AddRange(_return.ReturnPath(right));
                 }
             }
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.Colour != Colour)
                 {

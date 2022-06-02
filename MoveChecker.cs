@@ -8,20 +8,18 @@ namespace ChessGame
 {
     public class MoveCheckerPiece
     {
-        private List<PieceManager> _board;
         private PieceManager _piece;
 
-        public MoveCheckerPiece(List<PieceManager> board, PieceManager p)
+        public MoveCheckerPiece(PieceManager p)
         {
             _piece = p;
-            _board = board;
         }
 
         public List<IHavePosition> MoveLeftUp(int i, int posX, int posY, bool hasPiece)
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
@@ -40,7 +38,7 @@ namespace ChessGame
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
@@ -59,7 +57,7 @@ namespace ChessGame
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
@@ -78,7 +76,7 @@ namespace ChessGame
         {
             bool _hasPiece = false;
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.PosX == posX && p.PosY == posY && p.Colour != _piece.Colour)
                     _hasPiece = true;
@@ -151,13 +149,13 @@ namespace ChessGame
                 }
             }
             List<IHavePosition> tempList = new List<IHavePosition>();
-            tempList.AddRange(_board);
+            tempList.AddRange(Board.Instance.GameBoard);
             foreach (PieceManager p in tempList)
             {
                 foreach (IHavePosition sq in toRemove)
                 {
                     if (p.IsEqual(sq))
-                        _board.Remove(p);
+                        Board.Instance.GameBoard.Remove(p);
                 }
             }
         }

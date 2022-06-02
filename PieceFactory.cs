@@ -8,41 +8,41 @@ namespace ChessGame
 {
     public class PieceFactory
     {
-        public Piece CreatePiece(PieceType piece, List<PieceManager> board, PieceManager p)
+        public Piece CreatePiece(PieceType piece, PieceManager p)
         {
             switch (piece)
             {
                 case PieceType.King:
                     p.Identifier = "K";
-                    return new King(board, p);
+                    return new King(p);
 
                 case PieceType.Queen:
                     p.Identifier = "Q";
-                    return new Queen(board, p);
+                    return new Queen(p);
                     
                 case PieceType.Pawn:
                     p.Identifier = "P";
-                    return new Pawn(board, p);
+                    return new Pawn(p);
                     
                 case PieceType.Bishop:
                     p.Identifier = "B";
-                    return new Bishop(board, p);
+                    return new Bishop(p);
                     
                 case PieceType.Rook:
                     p.Identifier = "R";
-                    return new Rook(board, p);
+                    return new Rook(p);
                     
                 case PieceType.Knight:
                     p.Identifier = "N";
-                    return new Knight(board, p);
+                    return new Knight(p);
                     
                 case PieceType.Checker:
                     p.Identifier = "C";
-                    return new CheckerPiece(board, p);
+                    return new CheckerPiece(p);
                     
                 case PieceType.KingChecker:
                     p.Identifier = "KC";
-                    return new CheckerKingPiece(board, p);
+                    return new CheckerKingPiece(p);
                     
                 default:
                     return null;

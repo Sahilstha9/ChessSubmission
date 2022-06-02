@@ -9,11 +9,10 @@ namespace ChessGame
 {
     public class Knight : Piece, IPieceStrategy
     {
-        public Knight(List<PieceManager> board, PieceManager controller)
+        public Knight(PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
-            _board = board;
         }
 
         public override bool Move(int posX, int posY)
@@ -38,7 +37,7 @@ namespace ChessGame
         public override List<IHavePosition> AvailableMove()
         {
             List<IHavePosition> path = new List<IHavePosition>();
-            foreach (PieceManager sq in _board)
+            foreach (PieceManager sq in Board.Instance.GameBoard)
             {
                 if (sq.Colour != Colour)
                 {
@@ -70,7 +69,7 @@ namespace ChessGame
             }
             List<IHavePosition> tempList = new List<IHavePosition>();
             tempList.AddRange(path);
-            foreach(PieceManager p in _board)
+            foreach(PieceManager p in Board.Instance.GameBoard)
             {
                 foreach(IHavePosition sq in path)
                 {

@@ -14,13 +14,12 @@ namespace ChessGame
         private List<IHavePosition> up, down, left, right, leftup, rightdown, leftdown, rightup;
         private Return _return;
 
-        public Queen(List<PieceManager> board, PieceManager controller)
+        public Queen(PieceManager controller)
         {
             _controller = controller;
-            Colour = controller.Colour;
-            _board = board;
-            _moveDiagonal = new Lazy<MoveDiagonal>(() => new MoveDiagonal(_board, _controller));
-            _moveStraight = new Lazy<MoveStraight>(() => new MoveStraight(_board, _controller));
+            Colour = _controller.Colour;
+            _moveDiagonal = new Lazy<MoveDiagonal>(() => new MoveDiagonal(_controller));
+            _moveStraight = new Lazy<MoveStraight>(() => new MoveStraight(_controller));
             _return = new Return();
         }
 
@@ -90,7 +89,7 @@ namespace ChessGame
                 }
                 path.AddRange(_return.ReturnPath(right));
             }
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.Colour != Colour)
                 {

@@ -8,10 +8,8 @@ namespace ChessGame
 {
     public class TextGame
     {
-        private Board _main;
-        public TextGame(Board b)
+        public TextGame()
         {
-            _main = b;
         }
 
         public void PrintBoard()
@@ -24,7 +22,7 @@ namespace ChessGame
                     if (i % 2 == 0)
                     {
                         IHavePosition _toDraw = new EmptySquare(j, i / 2); ;
-                        foreach (PieceManager p in _main.GameBoard)
+                        foreach (PieceManager p in Board.Instance.GameBoard)
                         {
                             if (p.IsEqual(_toDraw))
                                 _toDraw = p;
@@ -55,7 +53,7 @@ namespace ChessGame
             else
             {
                 PieceManager piece = null;
-                foreach (PieceManager p in _main.GameBoard)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.AreYou(input[0].ToString() + input[1].ToString() + input[2].ToString()))
                         piece = p;
@@ -77,6 +75,24 @@ namespace ChessGame
                         Console.WriteLine("Invalid Move!!");
                 }
             }
+        }
+
+        public Game Home()
+        {
+            string input = "";
+            Console.WriteLine("Game Option : ");
+            Console.WriteLine("1. Chess");
+            Console.WriteLine("2. Checker");
+            Console.WriteLine("3. Mix");
+            input = Console.ReadLine();
+            if (input == "1")
+                return Game.Chess;
+            else if (input == "2")
+                return Game.Checker;
+            else if (input == "3")
+                return Game.Mix;
+            else
+                return Game.NotSet;
         }
     }
 }

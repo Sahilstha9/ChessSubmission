@@ -8,6 +8,6 @@ namespace ChessGame
 {
     public enum State
     {
-        Home, Game, Console
+        Home, Game, Console, ConsoleHome
     }
 }

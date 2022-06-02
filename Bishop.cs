@@ -12,12 +12,11 @@ namespace ChessGame
         private Lazy<MoveDiagonal> _moveDiagonal;
         private List<IHavePosition> leftup, rightdown, leftdown, rightup;
         private Return _return;
-        public Bishop(List<PieceManager> board, PieceManager controller)
+        public Bishop(PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
-            _board = board;
-            _moveDiagonal = new Lazy<MoveDiagonal>(() =>new MoveDiagonal(board, _controller));
+            _moveDiagonal = new Lazy<MoveDiagonal>(() =>new MoveDiagonal(_controller));
             _return = new Return();
         }
 
@@ -58,7 +57,7 @@ namespace ChessGame
                     path.AddRange(_return.ReturnPath(rightup));
                 }
             }
-            foreach (PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.Colour != Colour)
                 {

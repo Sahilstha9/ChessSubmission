@@ -8,13 +8,11 @@ namespace ChessGame
 {
     public class MoveDiagonal
     {
-        private List<PieceManager> _board;
         private int _index;
         private PieceManager _toPin;
         private PieceManager _piece;
-        public MoveDiagonal(List<PieceManager> board, PieceManager p)
+        public MoveDiagonal(PieceManager p)
         {
-            _board = board;
             _piece = p;
         }
 
@@ -25,7 +23,7 @@ namespace ChessGame
             while (_piece.PosX - i >= 0 && _piece.PosY - i >= 0)
             {
                 IHavePosition w = new EmptySquare(_piece.PosX - i, _piece.PosY - i);
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;
@@ -44,7 +42,7 @@ namespace ChessGame
             while (_piece.PosX - i >= 0 && _piece.PosY + i < 8)
             {
                 IHavePosition w = new EmptySquare(_piece.PosX - i, _piece.PosY + i);
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;
@@ -63,7 +61,7 @@ namespace ChessGame
             while (_piece.PosX + i < 8 && _piece.PosY - i >= 0)
             {
                 IHavePosition w = new EmptySquare(_piece.PosX + i, _piece.PosY - i);
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;
@@ -82,7 +80,7 @@ namespace ChessGame
             while (_piece.PosX + i < 8 && _piece.PosY + i < 8)
             {
                 IHavePosition w = new EmptySquare(_piece.PosX + i, _piece.PosY + i);
-                foreach(PieceManager p in _board)
+                foreach(PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;

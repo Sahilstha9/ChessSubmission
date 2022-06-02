@@ -8,12 +8,10 @@ namespace ChessGame
 {
     public class MoveStraight
     {
-        private List<PieceManager> _board;
         private int _index;
         private PieceManager _piece, _toPin;
-        public MoveStraight(List<PieceManager> board, PieceManager p)
+        public MoveStraight(PieceManager p)
         {
-            _board = board;
             _piece = p;
         }
 
@@ -24,7 +22,7 @@ namespace ChessGame
             while (y >= 0)
             {
                 IHavePosition w = new EmptySquare(_piece.PosX, y);
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;
@@ -43,7 +41,7 @@ namespace ChessGame
             while (y <= 7)
             {
                 IHavePosition w = new EmptySquare(_piece.PosX, y);
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;
@@ -62,7 +60,7 @@ namespace ChessGame
             while (x >= 0)
             {
                 IHavePosition w = new EmptySquare(x, _piece.PosY);
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;
@@ -81,7 +79,7 @@ namespace ChessGame
             while (x <= 7)
             {
                 IHavePosition w = new EmptySquare(x, _piece.PosY);
-                foreach (PieceManager p in _board)
+                foreach (PieceManager p in Board.Instance.GameBoard)
                 {
                     if (p.IsEqual(w))
                         w = p;

@@ -10,7 +10,6 @@ namespace ChessGame
     public abstract class Piece : IPieceStrategy
     {
         private bool _colour;
-        protected List<PieceManager> _board;
         protected PieceManager _controller;
 
         public virtual bool Move(int posX, int posY)
@@ -39,7 +38,7 @@ namespace ChessGame
         {
             PieceManager p = null;
             List<IHavePosition> blockingpath = new List<IHavePosition>();
-            foreach (PieceManager piece in _board)
+            foreach (PieceManager piece in Board.Instance.GameBoard)
             {
                 if (piece.Checker)
                     p = piece ;
@@ -58,12 +57,12 @@ namespace ChessGame
         protected void RemovePieceFromBoard(int x, int y)
         {
             PieceManager toRemove = null;
-            foreach(PieceManager p in _board)
+            foreach(PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.PosX == x && p.PosY == y)
                     toRemove = p;
             }
-            _board.Remove(toRemove);
+            Board.Instance.GameBoard.Remove(toRemove);
         }
 
         public virtual List<IHavePosition> CheckPath(IHavePosition king)

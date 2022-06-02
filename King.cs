@@ -10,18 +10,17 @@ namespace ChessGame
     public class King : Piece, IPieceStrategy
     {
         private bool _hasmoved;
-        public King(List<PieceManager> board, PieceManager controller)
+        public King(PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
-            _board = board;
             _hasmoved = false;
         }
 
         public override bool Move(int posX, int posY)
         {
             IHavePosition toMove = new EmptySquare(posX, posY);
-            foreach(PieceManager p in _board)
+            foreach(PieceManager p in Board.Instance.GameBoard)
             {
                 if(p.IsEqual(toMove) && p.Piece is Rook && (p as PieceManager).Colour == Colour)
                 {
@@ -60,7 +59,7 @@ namespace ChessGame
                 {
                     for (int i = 1; i < _controller.PosX; i++)
                     {
-                        foreach(PieceManager p in _board)
+                        foreach(PieceManager p in Board.Instance.GameBoard)
                         {
                             if (p.PosY == _controller.PosY && p.PosX == i)
                                 return false;
@@ -82,7 +81,7 @@ namespace ChessGame
                 {
                     for (int i = _controller.PosX + 1; i < 7; i++)
                     {
-                        foreach (PieceManager p in _board)
+                        foreach (PieceManager p in Board.Instance.GameBoard)
                         {
                             if (p.PosY == _controller.PosY && p.PosX == i)
                                 return false;
@@ -109,7 +108,7 @@ namespace ChessGame
         {
             List<IHavePosition> path = new List<IHavePosition>();
             path.AddRange(AllPath());
-            foreach(PieceManager p in _board)
+            foreach(PieceManager p in Board.Instance.GameBoard)
             {
                 if (p == _controller)
                     continue;
@@ -140,7 +139,7 @@ namespace ChessGame
                         path = RemoveSquare(path, p.AvailableMove());
                 }
             }
-            foreach (PieceManager px in _board)
+            foreach (PieceManager px in Board.Instance.GameBoard)
             {
                 if (px.Colour == Colour)
                     path.Remove(px);
@@ -173,7 +172,7 @@ namespace ChessGame
                     if (i >= 0 && i < 8 && j >= 0 && j < 8)
                     {
                         IHavePosition square = new EmptySquare(i, j);
-                        foreach (PieceManager p in _board)
+                        foreach (PieceManager p in Board.Instance.GameBoard)
                         {
                             if (p.IsEqual(square))
                                 square = p;

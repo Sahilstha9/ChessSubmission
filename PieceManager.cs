@@ -13,21 +13,19 @@ namespace ChessGame
         private bool _ispinned, _selected, _colour, _gameOver, _checker;
         private Lazy<PieceManager> _pinner;
         private Player _player;
-        private List<PieceManager> _board;
         private IPieceStrategy _piece;
         private string _identifier;
         private PieceFactory _pieceCreator;
 
-        public PieceManager(int posX, int posY, bool colour, List<PieceManager> board, PieceType piece)
+        public PieceManager(int posX, int posY, bool colour, PieceType piece)
         {
             _posX = posX;
             _posY = posY;
             _colour = colour;
-            _board = board;
             _gameOver = false;
             _pinner = new Lazy<PieceManager>();
             _pieceCreator = new PieceFactory();
-            _piece = _pieceCreator.CreatePiece(piece, _board, this);
+            _piece = _pieceCreator.CreatePiece(piece, this);
             InitaliseIdentifier();
         }
 
@@ -98,7 +96,7 @@ namespace ChessGame
                 case CheckerPiece:
                     string val = "";
                     int x = 0;
-                    foreach(PieceManager piece in _board)
+                    foreach(PieceManager piece in Board.Instance.GameBoard)
                     {
                         if (piece.Piece is CheckerPiece && piece.Colour == Colour)
                             x++;
@@ -113,7 +111,7 @@ namespace ChessGame
                     break;
                 case CheckerKingPiece:
                     int w = 0;
-                    foreach (PieceManager piece in _board)
+                    foreach (PieceManager piece in Board.Instance.GameBoard)
                     {
                         if (piece.Piece is CheckerPiece)
                             w++;
@@ -165,7 +163,7 @@ namespace ChessGame
 
         public void Promotion()
         {
-            _piece = _pieceCreator.CreatePiece(Board.Instance.PromotionPiece, _board, this);
+            _piece = _pieceCreator.CreatePiece(Board.Instance.PromotionPiece, this);
         }
 
         public PieceManager Pinner

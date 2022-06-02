@@ -12,14 +12,13 @@ namespace ChessGame
         private bool _firstmove;
         private MoveStraight _moveStraight;
         private MoveDiagonal _moveDiagonal;
-        public Pawn(List<PieceManager> board, PieceManager controller)
+        public Pawn(PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
             _firstmove = true;
-            _board = board;
-            _moveStraight = new MoveStraight(_board, _controller);
-            _moveDiagonal = new MoveDiagonal(_board, _controller);
+            _moveStraight = new MoveStraight(_controller);
+            _moveDiagonal = new MoveDiagonal(_controller);
         }
 
         public override bool Move(int posX, int posY)
@@ -27,7 +26,7 @@ namespace ChessGame
             IHavePosition ToMove = new EmptySquare(posX, posY);
             foreach (IHavePosition sq in AvailableMove())
             {
-                if(sq.IsEqual(ToMove))
+                if (sq.IsEqual(ToMove))
                 {
                     if (sq is PieceManager && (sq as PieceManager).Colour == Colour)
                         return false;
@@ -58,7 +57,7 @@ namespace ChessGame
             if (Colour)
             {
                 pathToUse = _moveStraight.MoveUp();
-                if(_moveDiagonal.MoveLeftUp().Count > 0)
+                if (_moveDiagonal.MoveLeftUp().Count > 0)
                     capturePath.Add(_moveDiagonal.MoveLeftUp()[0]);
                 if (_moveDiagonal.MoveRightUp().Count > 0)
                     capturePath.Add(_moveDiagonal.MoveRightUp()[0]);
@@ -75,12 +74,12 @@ namespace ChessGame
                 path.Add(pathToUse[0]);
             if (_firstmove && pathToUse[1] is not PieceManager)
                 path.Add(pathToUse[1]);
-            foreach(IHavePosition p in capturePath)
+            foreach (IHavePosition p in capturePath)
             {
                 if (p is PieceManager && (p as PieceManager).Colour != Colour)
                     path.Add(p);
             }
-            if(_controller.Pinned)
+            if (_controller.Pinned)
             {
                 if (path.Contains(_controller.Pinner))
                 {
@@ -93,12 +92,12 @@ namespace ChessGame
                     path.Add(pathToUse[0]);
                 return path;
             }
-            foreach(PieceManager p in _board)
+            foreach (PieceManager p in Board.Instance.GameBoard)
             {
                 if (p.Checker && p.Colour != Colour)
                     return BlockingPath(path);
             }
-             return path;
+            return path;
         }
 
         public override void Draw()
