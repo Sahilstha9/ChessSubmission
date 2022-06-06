@@ -7,40 +7,39 @@ using SplashKitSDK;
 
 namespace ChessGame
 {
-    public class King : Piece, IPieceStrategy
+    public class King : Piece
     {
         private bool _hasmoved;
-        public King(PieceManager controller)
+        private bool _gameOver;
+        public King(bool colour, int posX, int posY, List<Piece> board)
         {
-            _controller = controller;
-            Colour = _controller.Colour;
+            Colour = colour;
+            PosX = posX;
+            PosY = posY;
+            _board = board;
+            _gameOver = false;
             _hasmoved = false;
         }
 
         public override bool Move(int posX, int posY)
         {
             IHavePosition toMove = new EmptySquare(posX, posY);
-            foreach(PieceManager p in Board.Instance.GameBoard)
+            foreach(Piece p in _board)
             {
-                if(p.IsEqual(toMove) && p.Piece is Rook && (p as PieceManager).Colour == Colour)
+                if(p.IsEqual(toMove) && p is Rook && (p as Piece).Colour == Colour)
                 {
                     if (Castling(p))
-                    {
-                        Board.Instance.Store();
                         return true;
-                    }
                 }
             }
             foreach(IHavePosition p in AvailableMove())
             {
                 if(p.IsEqual(toMove))
                 {
-                     if(p is EmptySquare || (p as PieceManager).Colour != Colour)
+                     if(p is EmptySquare || (p as Piece).Colour != Colour)
                     {
-                        Board.Instance.Store();
-                        RemovePieceFromBoard(posX, posY);
-                        _controller.PosX = posX;
-                        _controller.PosY = posY;
+                        PosX = posX;
+                        PosY = posY;
                         return true;
                     }
                 }
@@ -53,7 +52,7 @@ namespace ChessGame
             return new List<IHavePosition>();
         }
 
-        private bool Castling(PieceManager rook)
+        private bool Castling(Piece rook)
         {
             if (_hasmoved)
                 return false;
@@ -61,46 +60,46 @@ namespace ChessGame
             {
                 if (rook.PosX == 0)
                 {
-                    for (int i = 1; i < _controller.PosX; i++)
+                    for (int i = 1; i < PosX; i++)
                     {
-                        foreach(PieceManager p in Board.Instance.GameBoard)
+                        foreach(Piece p in _board)
                         {
-                            if (p.PosY == _controller.PosY && p.PosX == i)
+                            if (p.PosY == PosY && p.PosX == i)
                                 return false;
-                            else if((p as PieceManager).Colour != Colour)
+                            else if((p as Piece).Colour != Colour)
                             {
                                 foreach(IHavePosition x in p.AvailableMove())
                                 {
-                                    if (x.PosX == i && x.PosY == _controller.PosY)
+                                    if (x.PosX == i && x.PosY == PosY)
                                         return false;
                                 }
                             }
                         }
                     }
-                    _controller.PosX = 2;
+                    PosX = 2;
                     rook.PosX = 3;
                     return true;
                 }
                 else if (rook.PosX == 7)
                 {
-                    for (int i = _controller.PosX + 1; i < 7; i++)
+                    for (int i = PosX + 1; i < 7; i++)
                     {
-                        foreach (PieceManager p in Board.Instance.GameBoard)
+                        foreach (Piece p in _board)
                         {
-                            if (p.PosY == _controller.PosY && p.PosX == i)
+                            if (p.PosY == PosY && p.PosX == i)
                                 return false;
-                            else if ((p as PieceManager).Colour != Colour)
+                            else if ((p as Piece).Colour != Colour)
                             {
                                 foreach (IHavePosition x in p.AvailableMove())
                                 {
-                                    if (x.PosX == i && x.PosY == _controller.PosY)
+                                    if (x.PosX == i && x.PosY == PosY)
                                         return false;
                                 }
                             }
                         }
                     }
-                    _controller.PosX = 6;
-                    rook.PosX = 5;
+                    PosX = 2;
+                    rook.PosX = 3;
                     return true;
                 }
                 else
@@ -112,38 +111,38 @@ namespace ChessGame
         {
             List<IHavePosition> path = new List<IHavePosition>();
             path.AddRange(AllPath());
-            foreach(PieceManager p in Board.Instance.GameBoard)
+            foreach(Piece p in _board)
             {
-                if (p == _controller)
+                if (p == this)
                     continue;
-                else if (p.Piece is King)
-                    path = RemoveSquare(path, ((King)p.Piece).AllPath());
-                else if (p.Piece is Pawn && (p as PieceManager).Colour != Colour)
+                else if (p is King)
+                    path = RemoveSquare(path, ((King)p).AllPath());
+                else if (p is Pawn && (p as Piece).Colour != Colour)
                 {
                     List<IHavePosition> tempList = new List<IHavePosition>();
                     tempList.AddRange(path);
-                    foreach (IHavePosition sq in tempList)
+                    foreach (IHavePosition sq in path)
                     {
-                        if ((p as PieceManager).Colour)
+                        if ((p as Piece).Colour)
                         {
                             if ((sq.PosX == p.PosX + 1 || sq.PosX == p.PosX - 1) && sq.PosY == p.PosY - 1)
-                                path.Remove(sq);
+                                tempList.Remove(sq);
                         }
                         else
                         {
                             if ((sq.PosX == p.PosX + 1 || sq.PosX == p.PosX - 1) && sq.PosY == p.PosY + 1)
-                                path.Remove(sq);
+                                tempList.Remove(sq);
                         }
                     }
                     path = tempList;
                 }
                 else
                 {
-                    if ((p as PieceManager).Colour != Colour)
+                    if ((p as Piece).Colour != Colour)
                         path = RemoveSquare(path, p.AvailableMove());
                 }
             }
-            foreach (PieceManager px in Board.Instance.GameBoard)
+            foreach (Piece px in _board)
             {
                 if (px.Colour == Colour)
                     path.Remove(px);
@@ -169,14 +168,14 @@ namespace ChessGame
         public List<IHavePosition> AllPath()
         {
             List<IHavePosition> path = new List<IHavePosition>();
-            for (int i = _controller.PosX - 1; i <= _controller.PosX + 1; i++)
+            for (int i = PosX - 1; i <= PosX + 1; i++)
             {
-                for (int j = _controller.PosY - 1; j <= _controller.PosY + 1; j++)
+                for (int j = PosY - 1; j <= PosY + 1; j++)
                 {
                     if (i >= 0 && i < 8 && j >= 0 && j < 8)
                     {
                         IHavePosition square = new EmptySquare(i, j);
-                        foreach (PieceManager p in Board.Instance.GameBoard)
+                        foreach (Piece p in _board)
                         {
                             if (p.IsEqual(square))
                                 square = p;
@@ -188,17 +187,53 @@ namespace ChessGame
             return path;
         }
 
+        public bool GameOver
+        {
+            get { return _gameOver; }
+        }
+
         public bool HasMoved
         {
             get { return _hasmoved; }
         }
 
-        public override void Draw()
-        { 
-            if (Colour)
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wKingImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/w_king_png_shadow_128px.png"), _controller.PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, _controller.PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
+        public void CheckMate(Piece _checkingPiece)
+        {
+            _gameOver = true;
+            if (AvailableMove().Count > 0)
+                _gameOver = false;
             else
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bKingImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/b_king_png_shadow_128px.png"), _controller.PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, _controller.PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
+            {
+                List<IHavePosition> blockablePath = new List<IHavePosition>();
+                foreach (Piece p in _player.Pieces)
+                    blockablePath.AddRange(p.AvailableMove());
+                foreach (IHavePosition attackingPath in _checkingPiece.CheckPath(_player.KingPiece))
+                {
+                    foreach (IHavePosition blockingPath in blockablePath)
+                    {
+                        if (!(blockingPath is King))
+                        {
+                            if (attackingPath.IsEqual(blockingPath))
+                            {
+                                _gameOver = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void Draw()
+        {
+            if (Selected)
+            {
+                DrawOutline();
+                DrawAvailableMove();
+            }
+            if (Colour)
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wKingImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/w_king_png_shadow_128px.png"), PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
+            else
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bKingImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/b_king_png_shadow_128px.png"), PosX * Constants.Instance.Width + Constants.Instance.OffsetValue, PosY * Constants.Instance.Width + Constants.Instance.OffsetValue);
         }
     }
 }

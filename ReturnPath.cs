@@ -13,8 +13,10 @@ namespace ChessGame
             List<IHavePosition> returningPath = new List<IHavePosition>();
             foreach (IHavePosition p in path)
             {
+                if (p is King)
+                    break;
                 returningPath.Add(p);
-                if (p is PieceManager)
+                if (p is Piece)
                     break;
             }
             return returningPath;

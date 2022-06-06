@@ -8,115 +8,131 @@ namespace ChessGame
 {
     public class MoveStraight
     {
+        private List<Piece> _board;
         private int _index;
-        private PieceManager _piece, _toPin;
-        public MoveStraight(PieceManager p)
+        private bool _haspiece;
+        private Piece _piece;
+        public MoveStraight(List<Piece> board, Piece p)
         {
+            _board = board;
             _piece = p;
         }
 
         public List<IHavePosition> MoveUp()
         {
+            _index = -1;
+            _haspiece = false;
+            int i = 0;
             List<IHavePosition> path = new List<IHavePosition>();
             int y = _piece.PosY - 1;
             while (y >= 0)
             {
-                IHavePosition w = new EmptySquare(_piece.PosX, y);
-                foreach (PieceManager p in Board.Instance.GameBoard)
+                IHavePosition x = new EmptySquare(_piece.PosX, y);
+                foreach (Piece p in _board)
                 {
-                    if (p.IsEqual(w))
-                        w = p;
+                    if (p.IsEqual(x))
+                    {
+                        x = p;
+                        Pin(path, p, i);
+                    }
                 }
-                path.Add(w);
+                path.Add(x);
                 y--;
+                i++;
             }
-            Pin(path);
             return path;
         }
 
         public List<IHavePosition> MoveDown()
         {
+            _haspiece = false;
+            _index = -1;
+            int i = 0;
             List<IHavePosition> path = new List<IHavePosition>();
             int y = _piece.PosY + 1;
             while (y <= 7)
             {
-                IHavePosition w = new EmptySquare(_piece.PosX, y);
-                foreach (PieceManager p in Board.Instance.GameBoard)
+                IHavePosition x = new EmptySquare(_piece.PosX, y);
+                foreach (Piece p in _board)
                 {
-                    if (p.IsEqual(w))
-                        w = p;
+                    if (p.IsEqual(x))
+                    {
+                        x = p;
+                        Pin(path, p, i);
+                    }
                 }
-                path.Add(w);
+                path.Add(x);
+                i++;
                 y++;
             }
-            Pin(path);
             return path;
         }
 
         public List<IHavePosition> MoveLeft()
         {
+            _haspiece = false;
+            _index = -1;
+            int i = 0;
             List<IHavePosition> path = new List<IHavePosition>();
             int x = _piece.PosX - 1;
             while (x >= 0)
             {
                 IHavePosition w = new EmptySquare(x, _piece.PosY);
-                foreach (PieceManager p in Board.Instance.GameBoard)
+                foreach (Piece p in _board)
                 {
                     if (p.IsEqual(w))
+                    {
                         w = p;
+                        Pin(path, p, i);
+                    }
                 }
                 path.Add(w);
+                i++;
                 x--;
             }
-            Pin(path);
             return path;
         }
 
         public List<IHavePosition> MoveRight()
         {
+            _haspiece = false;
+            _index = -1;
+            int i = 0;
             List<IHavePosition> path = new List<IHavePosition>();
             int x = _piece.PosX + 1;
             while (x <= 7)
             {
                 IHavePosition w = new EmptySquare(x, _piece.PosY);
-                foreach (PieceManager p in Board.Instance.GameBoard)
+                foreach (Piece p in _board)
                 {
                     if (p.IsEqual(w))
+                    {
                         w = p;
+                        Pin(path, p, i);
+                    }
                 }
                 path.Add(w);
+                i++;
                 x++;
             }
-            Pin(path);
             return path;
         }
 
-        public void Pin(List<IHavePosition> path)
+        public void Pin(List<IHavePosition> path, Piece x, int i)
         {
-            if(_piece.Piece is not Pawn && _piece.Piece is not King)
+            if (!_haspiece)
             {
-                _index = 0;
-                foreach (IHavePosition sq in path)
+                _haspiece = true;
+                _index = i;
+            }
+            else
+            {
+                if (x is King && x.Colour != _piece.Colour)
                 {
-                    if (sq is PieceManager)
+                    if ((path[_index] as Piece).Colour != _piece.Colour && path[_index] is not King)
                     {
-                        PieceManager p = sq as PieceManager;
-                        if (p.Colour != _piece.Colour)
-                        {
-                            if (p.Piece is King)
-                            {
-                                if (_index == 1)
-                                {
-                                    _toPin.Pinned = true;
-                                    _toPin.Pinner = _piece;
-                                }
-                            }
-                            else if (p.Piece is not King)
-                            {
-                                _toPin = p;
-                                _index++;
-                            }
-                        }
+                        (path[_index] as Piece).Pinned = true;
+                        (path[_index] as Piece).Pinner = _piece;
                     }
                 }
             }

@@ -7,20 +7,22 @@ using SplashKitSDK;
 
 namespace ChessGame
 {
-    public class CheckerPiece : Piece, IPieceStrategy
+    public class CheckerPiece : Piece
     {
         private MoveCheckerPiece _move;
-        public CheckerPiece(PieceManager controller)
+        public CheckerPiece(bool colour, int posX, int posY, List<Piece> board)
         {
-            _controller = controller;
-            Colour = _controller.Colour;
-            _move = new MoveCheckerPiece(_controller);
+            Colour = colour;
+            PosX = posX;
+            PosY = posY;
+            _board = board;
+            _move = new MoveCheckerPiece(_board, this);
         }
 
         public override bool Move(int posX, int posY)
         {
             IHavePosition toMove = new EmptySquare(posX, posY);
-            foreach(PieceManager p in Board.Instance.GameBoard)
+            foreach(Piece p in _board)
             {
                 if (p.IsEqual(toMove))
                     return false;
@@ -29,19 +31,26 @@ namespace ChessGame
             {
                 if (p.IsEqual(toMove))
                 {
-                    Board.Instance.Store();
                     foreach(IHavePosition sq in CheckMustMove())
                     {
                         if (sq.IsEqual(p))
                             _move.RemovePiece(posX, posY);
                     }
                     if (Colour && posY == 0)
-                        _controller.Promotion();
-
+                    {
+                        _board.Add(new CheckerKingPiece(Colour, posX, posY, _board));
+                        _board.Remove(this);
+                    }
                     else if (!Colour && posY == 7)
-                        _controller.Promotion();
-                    _controller.PosX = posX;
-                    _controller.PosY = posY;
+                    {
+                        _board.Add(new CheckerKingPiece(Colour, posX, posY, _board));
+                        _board.Remove(this);
+                    }
+                    else
+                    {
+                        PosX = posX;
+                        PosY = posY;
+                    }
                     return true;
                 }
             }
@@ -55,23 +64,23 @@ namespace ChessGame
                 return (CheckMustMove());
             if(Colour)
             {
-                if (_controller.PosX - 1 >= 0 && _controller.PosY - 1 >= 0)
-                    path.Add(new EmptySquare(_controller.PosX - 1, _controller.PosY - 1));
-                if(_controller.PosX  + 1 < 8 && _controller.PosY - 1 >= 0)
-                    path.Add(new EmptySquare(_controller.PosX + 1, _controller.PosY - 1));
+                if (PosX - 1 >= 0 && PosY - 1 >= 0)
+                    path.Add(new EmptySquare(PosX - 1, PosY - 1));
+                if(PosX  + 1 < 8 && PosY - 1 >= 0)
+                    path.Add(new EmptySquare(PosX + 1, PosY - 1));
             }
             else
             {
-                if (_controller.PosX - 1 >= 0 && _controller.PosY + 1 < 8)
-                    path.Add(new EmptySquare(_controller.PosX - 1, _controller.PosY + 1));
-                if(_controller.PosX + 1 < 8 && _controller.PosY + 1 < 8)
-                    path.Add(new EmptySquare(_controller.PosX + 1, _controller.PosY + 1));
+                if (PosX - 1 >= 0 && PosY + 1 < 8)
+                    path.Add(new EmptySquare(PosX - 1, PosY + 1));
+                if(PosX + 1 < 8 && PosY + 1 < 8)
+                    path.Add(new EmptySquare(PosX + 1, PosY + 1));
             }
             List<IHavePosition> tempList = new List<IHavePosition>();
             tempList.AddRange(path);
             foreach(IHavePosition sq in tempList)
             {
-                foreach(PieceManager p in Board.Instance.GameBoard)
+                foreach(Piece p in _board)
                 {
                     if (p.IsEqual(sq))
                         path.Remove(sq);
@@ -82,10 +91,15 @@ namespace ChessGame
 
         public override void Draw()
         {
+            if (Selected)
+            {
+                DrawOutline();
+                DrawAvailableMove();
+            }
             if (Colour)
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wCheckerImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/WhitePiece.png"), _controller.PosX * Constants.Instance.Width + 50, _controller.PosY * Constants.Instance.Width + 50);
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wCheckerImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/WhitePiece.png"), PosX * Constants.Instance.Width + 50, PosY * Constants.Instance.Width + 50);
             else
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bCheckerImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/BlackCheckerPiece.png"), _controller.PosX * Constants.Instance.Width + 50, _controller.PosY * Constants.Instance.Width + 50);
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bCheckerImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/BlackCheckerPiece.png"), PosX * Constants.Instance.Width + 50, PosY * Constants.Instance.Width + 50);
         }
 
         private List<IHavePosition> CheckMustMove()
@@ -93,13 +107,13 @@ namespace ChessGame
             List<IHavePosition> path = new List<IHavePosition>();
             if (Colour)
             {
-                path.AddRange(_move.MoveLeftUp(1, _controller.PosX -1, _controller.PosY - 1, false));
-                path.AddRange(_move.MoveRightUp(1, _controller.PosX + 1, _controller.PosY - 1, false));
+                path.AddRange(_move.MoveLeftUp(1, PosX -1, PosY - 1, false));
+                path.AddRange(_move.MoveRightUp(1, PosX + 1, PosY - 1, false));
             }
             else
             {
-                path.AddRange(_move.MoveLeftDown(1, _controller.PosX - 1, _controller.PosY + 1, false));
-                path.AddRange(_move.MoveRightDown(1, _controller.PosX + 1, _controller.PosY + 1, false));
+                path.AddRange(_move.MoveLeftDown(1, PosX - 1, PosY + 1, false));
+                path.AddRange(_move.MoveRightDown(1, PosX + 1, PosY + 1, false));
             }
             return path;
         }
