@@ -8,7 +8,7 @@ namespace ChessGame
 {
     public class PieceFactory
     {
-        public Piece CreatePiece(PieceType piece, PieceManager p)
+        public IPieceStrategy CreatePiece(PieceType piece, PieceManager p)
         {
             switch (piece)
             {

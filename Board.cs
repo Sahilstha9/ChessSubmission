@@ -47,8 +47,8 @@ namespace ChessGame
         {
             set
             {
-                _board = new List<PieceManager>();
-                new PieceManagerFactory(value);
+                PieceManagerFactory _factory = new PieceManagerFactory();
+                _board = _factory.InitalisePiece(value);
                 List<PieceManager> whitepiece = new List<PieceManager>();
                 List<PieceManager> blackpiece = new List<PieceManager>();
                 foreach (PieceManager p in _board)
