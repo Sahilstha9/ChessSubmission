@@ -26,6 +26,7 @@ namespace ChessGame
             _seconds.Decrement();
             if (_seconds.Ticks < 0)
             {
+                MinsDecrement();
                 _seconds.Reset();
             }
         }

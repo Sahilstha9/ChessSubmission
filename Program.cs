@@ -8,24 +8,35 @@ namespace ChessGame // Note: actual namespace depends on the project name.
         static void Main(string[] args)
         {
             new Window("Shape Drawer", 750, 750);
-            Screen gamechoice = Screen.Home;
+            State gamechoice = State.Home;
             do
             {
                 SplashKit.ProcessEvents();
                 SplashKit.ClearScreen(Color.RGBColor(50, 50, 0));
-                Board.Instance.Draw();
                 switch(gamechoice)
                 {
-                    case Screen.Home:
+                    case State.Home:
                         Game choice = DrawHomeScreen();
+                        if (SplashKit.KeyTyped(KeyCode.TKey))
+                            gamechoice = State.ConsoleHome;
                         if (choice != Game.NotSet)
                         {
-                            gamechoice = Screen.Game;
+                            gamechoice = State.Game;
                             Board.Instance.SetType = choice;
                         }
                         break;
-                    case Screen.Game:
-                        foreach (Piece p in Board.Instance.GameBoard)
+                    case State.ConsoleHome:
+                        Game choices = Board.Instance.TextGame.Home();
+                        if(choices != Game.NotSet)
+                        {
+                            gamechoice = State.Console;
+                            Board.Instance.SetType = choices;
+                            Board.Instance.TextGame.PrintBoard();
+                        }
+                        break;
+                    case State.Game:
+                        Board.Instance.Draw();
+                        foreach (PieceManager p in Board.Instance.GameBoard)
                             p.Draw();
                         Board.Instance.Update();
 
@@ -34,7 +45,7 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                             if (!Board.Instance.GameOver)
                             {
                                 IHavePosition s = null;
-                                foreach(Piece p in Board.Instance.GameBoard)
+                                foreach(PieceManager p in Board.Instance.GameBoard)
                                 {
                                     if (p.IsAt(SplashKit.MousePosition()))
                                         s = p;
@@ -45,7 +56,41 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                                     Board.Instance.LeftClick(EmptySquareIsAt(SplashKit.MousePosition()));
                             }
                             else
-                                gamechoice = Screen.Home;
+                                gamechoice = State.Home;
+                        }
+                        if(SplashKit.KeyTyped(KeyCode.CKey))
+                            Board.Instance.ChangePromotionPiece();
+                        if (SplashKit.KeyTyped(KeyCode.TKey))
+                        {
+                            Board.Instance.TextGame.PrintBoard();
+                            gamechoice = State.Console;
+                        }
+                        if (SplashKit.KeyTyped(KeyCode.LeftKey))
+                            Board.Instance.Undo();
+                        else if (SplashKit.KeyTyped(KeyCode.RightKey))
+                            Board.Instance.Redo();
+                        break;
+                    case State.Console:
+                        while (true)
+                        {
+                            Board.Instance.Update();
+                            if (Board.Instance.GameOver)
+                            {
+                                Console.WriteLine("CheckMate");
+                                Console.ReadLine();
+                                if (SplashKit.AnyKeyPressed())
+                                    gamechoice = State.Home;
+                            }
+                            Console.WriteLine("\nEnter commnad: (Format :<PieceName><X to Move><Y to Move>)");
+                            string sentence = Console.ReadLine();
+                            if (sentence.ToLower() == "quit" || sentence.ToLower() == "exit")
+                                break;
+                            else if (sentence.ToLower() == "change")
+                            {
+                                gamechoice = State.Game;
+                                break;
+                            }
+                            Board.Instance.Input(sentence);
                         }
                         break;
                 }
