@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,12 +9,12 @@ namespace ChessGame
 {
     public class CheckerKingPiece : Piece, IPieceStrategy
     {
-        private MoveCheckerPiece _move;
+        private Lazy<MoveCheckerPiece> _move;
         public CheckerKingPiece(PieceManager controller)
         {
             _controller = controller;
             Colour = _controller.Colour;
-            _move = new MoveCheckerPiece(_controller);
+            _move = new Lazy<MoveCheckerPiece>(() => new MoveCheckerPiece(_controller));
         }
 
         public override bool Move(int posX, int posY)
@@ -33,7 +33,7 @@ namespace ChessGame
                     foreach (IHavePosition sq in CheckMustMove())
                     {
                         if (sq.IsEqual(p))
-                            _move.RemovePiece(posX, posY);
+                            _move.Value.RemovePiece(posX, posY);
                     }
                     _controller.PosX = posX;
                     _controller.PosY = posY;
@@ -74,19 +74,19 @@ namespace ChessGame
         public List<IHavePosition> CheckMustMove()
         {
             List<IHavePosition> path = new List<IHavePosition>();
-            path.AddRange(_move.MoveLeftUp(1, _controller.PosX - 1, _controller.PosY - 1, false));
-            path.AddRange(_move.MoveRightUp(1, _controller.PosX + 1, _controller.PosY - 1, false));
-            path.AddRange(_move.MoveLeftDown(1, _controller.PosX - 1, _controller.PosY + 1, false));
-            path.AddRange(_move.MoveRightDown(1, _controller.PosX + 1, _controller.PosY + 1, false));
+            path.AddRange(_move.Value.MoveLeftUp(1, _controller.PosX - 1, _controller.PosY - 1, false));
+            path.AddRange(_move.Value.MoveRightUp(1, _controller.PosX + 1, _controller.PosY - 1, false));
+            path.AddRange(_move.Value.MoveLeftDown(1, _controller.PosX - 1, _controller.PosY + 1, false));
+            path.AddRange(_move.Value.MoveRightDown(1, _controller.PosX + 1, _controller.PosY + 1, false));
             return path;
         }
 
         public override void Draw()
         {
             if (Colour)
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wKingImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/WhiteKing.png"), _controller.PosX * Constants.Instance.Width + 50, _controller.PosY * Constants.Instance.Width + 50);
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("wKingCheckerImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/WhiteKing.png"), _controller.PosX * Constants.Instance.Width + 50, _controller.PosY * Constants.Instance.Width + 50);
             else
-                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bKingImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/KingCheckerPiece.png"), _controller.PosX * Constants.Instance.Width + 50, _controller.PosY * Constants.Instance.Width + 50);
+                SplashKit.DrawBitmap(SplashKit.LoadBitmap("bKingCheckerImage", "E:/C#/cs/ChessGame/ChessGame/Resources/Images/KingCheckerPiece.png"), _controller.PosX * Constants.Instance.Width + 50, _controller.PosY * Constants.Instance.Width + 50);
         }
     }
 }
