@@ -1,6 +1,8 @@
 ﻿using System;
 using SplashKitSDK;
 
+//Please change image file path to relative
+//I am facing error when I use relative path
 namespace ChessGame // Note: actual namespace depends on the project name.
 {
     public class Program
@@ -13,7 +15,6 @@ namespace ChessGame // Note: actual namespace depends on the project name.
             {
                 SplashKit.ProcessEvents();
                 SplashKit.ClearScreen(Color.RGBColor(50, 50, 0));
-                Board.Instance.Draw();
                 switch(gamechoice)
                 {
                     case Screen.Home:
@@ -27,6 +28,7 @@ namespace ChessGame // Note: actual namespace depends on the project name.
                     case Screen.Game:
                         foreach (Piece p in Board.Instance.GameBoard)
                             p.Draw();
+                        Board.Instance.Draw();
                         Board.Instance.Update();
 
                         if (SplashKit.MouseClicked(MouseButton.LeftButton))
